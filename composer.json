@@ -1,0 +1,22 @@
+{
+  "name": "corbpie/streamable-dl",
+  "description": "Class to download streamable videos",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "corbpie",
+      "email": "contact@corbpie.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "ext-curl": "*",
+    "ext-dom": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Corbpie\\StreamableDl\\": "src/"
+    }
+  }
+}
