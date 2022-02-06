@@ -37,8 +37,7 @@ The output will be:
     "date_time": "2021-10-27 09:43:25",
     "task": "doCurl",
     "args": [
-      "https:\/\/streamable.com\/8mr65",
-      "https:\/\/reddit.com\/"
+      "https:\/\/streamable.com\/8mr65"
     ],
     "http_code": 200
   },
