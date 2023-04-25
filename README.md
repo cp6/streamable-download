@@ -83,4 +83,4 @@ If you have an invalid URL (404 HTTP code):
 ]
 ```
 
-**Note** To get video file information with ```getVideoDetails()``` you need FFmpeg installed.
+**Note** To get video file information with ```getVideoDetails()``` you need FFmpeg (FFprobe) installed.
