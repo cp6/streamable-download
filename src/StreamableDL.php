@@ -19,14 +19,14 @@ class StreamableDL
         $this->save_as = $save_as;
     }
 
-    private function doCurl(string $url, string $referer): int
+    private function doCurl(string $url, string $referer): void
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
+        $crl = curl_init();
+        curl_setopt($crl, CURLOPT_URL, $url);
+        curl_setopt($crl, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($crl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($crl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($crl, CURLOPT_HEADER, 1);
         $headers = [
             'Host: streamable.com',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*',
@@ -34,21 +34,20 @@ class StreamableDL
             'Accept-Language: en-US,en;q=0.5',
             'Cache-Control: no-cache',
             'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
-            'Referer: ' . $referer . '',
+            'Referer: ' . $referer,
             'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'
         ];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_ENCODING, "");
-        $this->html_page_content = curl_exec($ch);
-        $this->http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        $this->output_message[] = array(
+        curl_setopt($crl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($crl, CURLOPT_ENCODING, "");
+        $this->html_page_content = curl_exec($crl);
+        $this->http_code = curl_getinfo($crl, CURLINFO_HTTP_CODE);
+        curl_close($crl);
+        $this->output_message[] = [
             'date_time' => date('Y-m-d H:i:s'),
             'task' => __FUNCTION__,
             'args' => func_get_args(),
             'http_code' => $this->http_code
-        );
-        return $this->http_code;
+        ];
     }
 
     private function getVideoDirectLink(): void
@@ -57,22 +56,22 @@ class StreamableDL
         @$doc->loadHTML($this->html_page_content);
         $dl_link = $doc->getElementsByTagName('video')[0]->getAttribute('src');
         $this->video_direct_link = str_replace("//", "https://", $dl_link);
-        $this->output_message[] = array(
+        $this->output_message[] = [
             'date_time' => date('Y-m-d H:i:s'),
             'task' => __FUNCTION__,
             'link' => $this->video_direct_link
-        );
+        ];
     }
 
     private function saveVideoFile(): void
     {
         $result = file_put_contents($this->save_as, file_get_contents($this->video_direct_link));
-        $this->output_message[] = array(
+        $this->output_message[] = [
             'date_time' => date('Y-m-d H:i:s'),
             'task' => __FUNCTION__,
             'args' => func_get_args(),
             'result' => $result
-        );
+        ];
     }
 
     private function getVideoSizeFromUrl(): int
@@ -84,6 +83,7 @@ class StreamableDL
     {
         if (file_exists($file_name)) {
             $data = json_decode(shell_exec("ffprobe -v quiet -print_format json -show_format -show_streams $file_name"), true);
+
             if (isset($data['streams'])) {
                 $first_stream = $data['streams'][0];
                 $fr_array = explode('/', $first_stream['r_frame_rate']);//Splits frame rate string into array 60/1 -> 60,1
@@ -95,7 +95,8 @@ class StreamableDL
                 } else {
                     $audio_codec = $audio_bitrate = $audio_rate = null;
                 }
-                return array(
+
+                return [
                     'filename' => $data['format']['filename'] ?? null,
                     'media_link' => $file_name,
                     'height' => $first_stream['height'] ?? null,
@@ -111,34 +112,38 @@ class StreamableDL
                     'audio_codec' => $audio_codec,
                     'audio_bitrate' => $audio_bitrate,
                     'audio_rate' => $audio_rate
-                );
+                ];
+
             }
         } else {
-            return array("message" => "$file_name seems to be corrupt");
+            return ["message" => "$file_name seems to be corrupt"];
         }
-        return array("message" => "$file_name was not found");
+        return ["message" => "$file_name was not found"];
     }
 
     public function downloadVideo(string $referer = 'https://reddit.com/'): array
     {
         $this->doCurl($this->url, $referer);
+
         if ($this->http_code === 200) {
             $this->getVideoDirectLink();
             $this->saveVideoFile();
-            $this->output_message[] = array(
+            $this->output_message[] = [
                 'date_time' => date('Y-m-d H:i:s'),
                 'task' => __FUNCTION__,
                 'message' => 'Downloaded video',
                 'saved_as' => $this->save_as
-            );
+            ];
         } else {
-            $this->output_message[] = array(
+            $this->output_message[] = [
                 'date_time' => date('Y-m-d H:i:s'),
                 'task' => __FUNCTION__,
                 'message' => 'Failed to get video url',
                 'http_code' => $this->http_code
-            );
+            ];
         }
+
         return $this->output_message;
     }
+
 }
