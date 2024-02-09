@@ -1,6 +1,6 @@
 # streamable download
 
-A PHP class to download streamable video
+A PHP class to download streamable videos from URL
 
 ## Usage
 
