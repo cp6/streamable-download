@@ -1,6 +1,6 @@
 # streamable download
 
-A PHP class to download streamable videos from URL
+A PHP class to download streamable videos from their URL
 
 ## Usage
 
@@ -8,7 +8,7 @@ Install with:
 
 ```composer require corbpie/streamable-dl```
 
-Use like:
+Usage example:
 
 ```php
 <?php
