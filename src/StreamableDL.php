@@ -70,6 +70,8 @@ class StreamableDL
             'date_time' => date('Y-m-d H:i:s'),
             'task' => __FUNCTION__,
             'args' => func_get_args(),
+            'video_url' => $this->video_direct_link,
+            'save_as' => $this->save_as,
             'result' => $result
         ];
     }
